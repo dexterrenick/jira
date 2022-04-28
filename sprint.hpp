@@ -23,7 +23,7 @@ public:
 
 private:
     // Static variable for current sprint
-    static int currentSprint = 0;
+    inline static int currentSprint = 0;
     // sprint ID
     int sprintID;
     // time frame available for the project

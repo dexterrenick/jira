@@ -13,6 +13,20 @@ using namespace std;
 
 
 Project::Project(string PName, int ProjectDeadline, vector<Issue> issuesToDo, 
+vector<Sprint> sprints, TeamMember owner, vector<TeamMember> leads, vector<TeamMember> developers) {
+    projectID = this->currentProject;
+    currentProject++;
+    projectName = PName;
+    projectDeadline = ProjectDeadline;
+    toDo = issuesToDo;
+    inProgress = sprints; 
+    done = NULL;
+    projectOwner = owner;
+    projectLeads = leads;
+    teamDevelopers = developers;
+}
+
+Project::Project(string PName, int ProjectDeadline, vector<Issue> issuesToDo, 
 vector<Sprint> sprints, vector<Issue> issuesDone, TeamMember owner, vector<TeamMember> leads, vector<TeamMember> developers) {
     projectID = this->currentProject;
     currentProject++;
@@ -47,12 +61,17 @@ void Project::saveState(){
             saved << "Project Name: " << projectName << endl;
             saved << "Project Deadline: " << projectDeadline << endl;
             saved << "Issues To Do: " << toDo << endl;
-            saved << "Sprints In Progress: " << inProgress << endl;
-            saved << "Issues Completed: " << done << endl;
-            saved << "Project Owner: " << projectOwner << endl;
-            saved << "Project Leads: " << projectLeads << endl;
-            saved << "Developers: " << teamDevelopers << endl;
+            saved << "Sprints In Progress: " << (inProgress) << endl;
+            saved << "Issues Completed: " << (done) << endl;
+            saved << "Project Owner: " << (projectOwner) << endl;
+            saved << "Project Leads: " << (projectLeads) << endl;
+            saved << "Developers: " << (teamDevelopers) << endl;
  
      }
      saved.close();
 }
+
+string Project::getUserRole(string currentUser) {
+    cout << "GET USER ROLE" << endl;
+}
+

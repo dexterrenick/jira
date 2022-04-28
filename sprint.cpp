@@ -12,3 +12,4 @@ Sprint::Sprint(int givenID, int timeAllowed, int TimeSpent, vector<Issue> proble
     issues=problems;
     
 }
+

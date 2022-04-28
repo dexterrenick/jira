@@ -175,17 +175,18 @@ void Jira::displaySignInUp() {
     createAccount();
 }
 
-void Jira::saveUsers();
+void Jira::saveUsers() {
     ofstream myfile("example.txt");
     if (myfile.is_open()) {
         for (int i = 0; i < users.size(); i++) {
-            myfile << users.at(i).getUserName() << endl;
+            myfile << (users.at(i).getUserName()) << endl;
         }
         myfile.close();
     }
+}
 
 void Jira::incrementTime() {
-    this.time++;
+    this->time++;
 }
 
 void Jira::displayJiraHome() {
@@ -197,39 +198,39 @@ void Jira::displayJiraHome() {
     while (iter != projects.end()) {
         if ((iter->first).hasUser(this->userName)) {
             userProjects.push_back((iter->first).getProjectID);
-            cout << "PID: " << (iter->first).getProjectID() << " PROJECT NAME: " << (iter->first).getProjectName() << (iter->first).getUserRole(userName) << endl;
+            cout << "PID: " << ((iter->first).getProjectID()) << " PROJECT NAME: " << ((iter->first).getProjectName()) << ((iter->first).getUserRole(userName)) << endl;
         }
     }
     // Give them option to create a project
     cout << endl;
     
-    
+    int openProjectInt;
     if (userProjects.size() == 0) {
-        cout << "It looks like you aren't in any projects!"
+        cout << "It looks like you aren't in any projects!" << endl;
     } else {
-        validProjectEntered = false;
+        bool validProjectEntered = false;
         while (!validProjectEntered) {
             cout << "Which project would you like to open?" << endl;
-            cout << "ENTER PID: " << endl
+            cout << "ENTER PID: " << endl;
             string openProject;
             cin >> openProject;
 
             try {
-                int openProjectInt = stoi(openProject)
+                int openProjectInt = stoi(openProject);
                 if (count(userProjects.begin(), userProjects.end(), openProjectInt)) {
                     validProjectEntered = true;
                 }
-            } catch {
+            } catch(...) {
                 cout << "Please enter the PID, a number." << endl;
             }
             cout << "Invalid PID, please try again." << endl;
         }
     }
-    auto iter = projects.begin();
+    iter = projects.begin();
     // IF it is in users projects, we know it is an existing project
     while (iter != projects.end()) {
-        if (openProjectInt == (iter->first).getProjectID()) {
-            (iter->first).displayProject(userName)
+        if (openProjectInt == ((iter->first).getProjectID())) {
+            (iter->first).displayProject(userName);
         }
     }
 }

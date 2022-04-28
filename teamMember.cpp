@@ -5,6 +5,6 @@
 using namespace std;
 
 TeamMember::TeamMember(string given_username) {
-    username = given_username;
+    this->username = given_username;
 }
 

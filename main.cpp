@@ -8,6 +8,10 @@
 #include "issue.hpp"
 #include "sprint.hpp"
 #include "jira.hpp"
+#include <stdio.h>
+#include <iostream>
+
+using namespace std;
 
 int main() {
     // Add if statement here to check for past written out file
@@ -16,4 +20,5 @@ int main() {
     //     displaySignInUp()
     //     displayJiraHome()
     // }
+    return -1;
 }

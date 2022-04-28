@@ -9,6 +9,7 @@ using namespace std;
 
 class TeamMember {
 public:
+    TeamMember();
     TeamMember(string given_username);
     void setUsername(string given_username) {username = given_username;}
     string getUsername() {return username;}
