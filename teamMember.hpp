@@ -4,6 +4,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -13,6 +14,7 @@ public:
     TeamMember(string given_username);
     void setUsername(string given_username) {username = given_username;}
     string getUsername() {return username;}
+    bool isMemberOf(vector<TeamMember> teammates);
 
 private:
     // team member username

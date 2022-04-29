@@ -14,6 +14,7 @@ using namespace std;
 
 class Project {
 public:
+    Project(string PName, int ProjectDeadline,  TeamMember owner, vector<TeamMember> leads, vector<TeamMember> developers);
     Project(string, int, vector<Issue>, vector<Sprint>, TeamMember, vector<TeamMember>, vector<TeamMember>);
     Project(string, int, vector<Issue>, vector<Sprint>, vector<Issue>, TeamMember, vector<TeamMember>, vector<TeamMember>);
     // So we can autoincrement
@@ -61,20 +62,33 @@ public:
 
     // saves current state to a text file
     void saveState(); 
+
+    // Determines if a given user is a member of this project
+    bool hasUser(string userString);
+
+    // Move issue from one state to another
+    void moveIssue(int issueID, string moveTo);
     
     // functions to add:
-    //moveIssue(issueID)
+   
     //createIssue(issueID)
-    //deleteIssue(issueID)
+    //deleteIssue(issueID) done
     //updateIssue(issueID)
     //assignIssue(issueID, teamMember)
 
     void displayProject(string currentUser);
 
-    void getUserRole(string currentUser);
+    // Returns string of users highest access level in given project
+    string getUserRole(string userString);
 
+    void createIssue(TeamMember member);
 
+    void deleteIssue(TeamMember owner, int issueID);
 
+    void updateIssue(TeamMember member, int issueID);
+
+    void assignIssue(TeamMember member, TeamMember assignee, int issueID);
+    
 
 
 private:

@@ -19,17 +19,21 @@ using namespace std;
 
 class Jira {
 protected:
-    int time;
+    // Time can be static because there won't be two jira applications
+    static int time;
     string userName;
-    map<Project, TeamMember> projects; 
+    vector<Project> projects; 
     vector<TeamMember> users;
 
 public:
     // Empty constructor for a new Jira Program if one doesn't exist yet
     Jira();
     // If there is an existing Jira Program, read in data
-    Jira(int time, map<Project, TeamMember> projects, vector<TeamMember> users);
-
+    Jira(int time, vector<Project> projects, vector<TeamMember> users);
+    // Destructor that saves all relevant data when program closes
+    ~Jira();
+    // Copy constructor
+    Jira(const Jira &j);
     // Allows project owner to make new prjoect
     void createProject(TeamMember owner);
     // Allows user to create an account if they do not yet have one
@@ -44,6 +48,19 @@ public:
     void displayJiraHome();
     // Allows user option to sign in or up for jira account
     void displaySignInUp();
+    // Timer to run asynchronously to control project time
+    // static void runTimer();
+    // Get time
+    int getTime() const {return this->time;}
+    // Get userName
+    string getUsername() const {return this->userName;}
+    // Get projects
+    vector<Project> getProjects() const {return this->projects;}
+    // Get projects
+    vector<TeamMember> getUsers() const {return this->users;}
+
+    // save current state of Jira to a text file
+    void saveJira();
 };
 
 #endif

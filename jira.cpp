@@ -8,6 +8,9 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <chrono>
+#include <iostream>
+#include <future>
 
 #include "project.hpp"
 #include "teamMember.hpp"
@@ -21,16 +24,27 @@ using namespace std;
 Jira::Jira() {
     this->time = 0;
     this->userName = "";
-    this->projects = map<Project, TeamMember>();
+    this->projects = vector<Project>();
     users = vector<TeamMember>();
 }
 
-Jira::Jira(int time, map<Project, TeamMember> projects, vector<TeamMember> users) {
+Jira::Jira(int time, vector<Project> projects, vector<TeamMember> users) {
     this->time = time;
     this->projects = projects;
     this->users = users;
     // Regardless of there is a program or not, when program is run, we need someone to sign in, so initialize as null
     this->userName = "";
+}
+
+Jira::~Jira() {
+    saveUsers();
+}
+
+Jira::Jira(const Jira &j) {
+    time = j.getTime();
+    userName = j.getUsername();
+    projects = j.getProjects();
+    users = j.getUsers();
 }
 
 void Jira::createProject(TeamMember owner) {
@@ -49,7 +63,7 @@ void Jira::createProject(TeamMember owner) {
     cin>>projectLeadSize;
     cout<<"Please choose the following users to be your project lead(s)."<<endl;
     for(int i = 0; i < users.size(); i++) {
-        if(users[i].getUsername() != owner) {
+        if(users[i].getUsername() != owner.getUsername()) {
             cout<<users[i].getUsername()<<", ";
         }
     }
@@ -71,7 +85,7 @@ void Jira::createProject(TeamMember owner) {
         projectLeadSize--;
     }
     
-    cout<<"How many developer(s) do you want ot include in this project?"<<endl;
+    cout<<"How many developer(s) do you want to include in this project?"<<endl;
     cin>>developerSize;
 
     cout<<"Please choose the following users to be your developers."<<endl;
@@ -103,16 +117,34 @@ void Jira::createProject(TeamMember owner) {
         developerSize--;
     }
 
+  vector<Sprint> listOfSprints;
+  char another = 'y';
+  
+   while(tolower(another) == 'y') {
+    vector<Issue> problems;
+    Sprint sprint1(0, 0, problems);
+    int timeFrame;
+    cout<<"Please give a time frame for this sprint."<<endl;
+    cin>> timeFrame;
+    sprint1.setTimeFrame(timeFrame);
 
-    vector<Sprint> listOfSprints(sprintSize);
-    vector<Issue> listOfTodo(toDoSize);
+    listOfSprints.push_back(sprint1);
+    cout<<"\nEnter another sprint? (y/n)"<<endl;
+    cin>>another;
+    cin.ignore();
+    cout<<endl;
+  } 
+  vector<Issue> listOfTodo;
+  vector<Issue> listOfDone;
+  
+  Project project1(projName, deadline, listOfTodo, listOfSprints, listOfDone, owner, prjLeads, developers);
 
-    this->projects.insert(pair<Project, TeamMember>(new Project(projName, deadline, listOfTodo, listOfSprints, owner, prjLeads, developers), owner));
+  this->projects.push_back(project1);
 }
 
 // Allows user to create an account if they do not yet have one
 void Jira::createAccount() {
-    string userEmail;
+    string userEmail, myText;
     cout << "Enter user email: " << endl;
     cin >> userEmail;
     // Verify they do not already have an account, if they don't add them to the list
@@ -120,7 +152,7 @@ void Jira::createAccount() {
     ifstream MyReadFile("users.txt");
 
     bool newUser = true;
-    if (!(fileStream.fail())) {
+    if (!(MyReadFile.fail())) {
         // Use a while loop together with the getline() function to read the file line by line
         while (getline(MyReadFile, myText)) {
             if(myText == userEmail) {
@@ -137,12 +169,13 @@ void Jira::createAccount() {
 }
 
 void signIn() {
-    string userEmail;
+    string userEmail, myText;
     cout << "Enter user email: " << endl;
     cin >> userEmail;
+    fstream MyReadFile("users.txt");
 
     bool userExists = false;
-    if (!(fileStream.fail())) {
+    if (!(MyReadFile.fail())) {
         // Use a while loop together with the getline() function to read the file line by line
         while (getline (MyReadFile, myText)) {
             if(myText == userEmail) {
@@ -152,17 +185,17 @@ void signIn() {
     }
     if (!userExists) {
         cout << "User not found." << endl;
-        displaySignInUp();
+        //displaySignInUp();
     }
     else {
-        displayJiraHome();
+       //displayJiraHome();
     }
 }
 
 void Jira::displaySignInUp() {
     string option = "";
     cout << "1) Sign in" << endl;
-    cout << "2) Sign up << endl" << endl;
+    cout << "2) Sign up" << endl;
     cout << "Enter your choice: " << endl;
     cin >> option;
     while (option != "1" || option != "2") {
@@ -179,7 +212,7 @@ void Jira::saveUsers() {
     ofstream myfile("example.txt");
     if (myfile.is_open()) {
         for (int i = 0; i < users.size(); i++) {
-            myfile << (users.at(i).getUserName()) << endl;
+            myfile << users.at(i).getUsername() << endl;
         }
         myfile.close();
     }
@@ -191,14 +224,13 @@ void Jira::incrementTime() {
 
 void Jira::displayJiraHome() {
     vector<int> userProjects = vector<int>();
-    auto iter = projects.begin();
     
     cout << "Here is a list of projects you are involved in and your role: " << endl;
     // Getting projects they are in
-    while (iter != projects.end()) {
-        if ((iter->first).hasUser(this->userName)) {
-            userProjects.push_back((iter->first).getProjectID);
-            cout << "PID: " << ((iter->first).getProjectID()) << " PROJECT NAME: " << ((iter->first).getProjectName()) << ((iter->first).getUserRole(userName)) << endl;
+    for(int i = 0; i < projects.size(); i++) {
+        if (projects.at(i).hasUser(this->userName)) {
+            userProjects.push_back(projects.at(i).getProjectID());
+            cout << "PID: " << projects.at(i).getProjectID() << " PROJECT NAME: " << (projects.at(i).getProjectName()) << " ROLE: " << (projects.at(i).getUserRole(userName)) << endl;
         }
     }
     // Give them option to create a project
@@ -212,25 +244,44 @@ void Jira::displayJiraHome() {
         while (!validProjectEntered) {
             cout << "Which project would you like to open?" << endl;
             cout << "ENTER PID: " << endl;
-            string openProject;
+            string openProject = "";
             cin >> openProject;
 
             try {
-                int openProjectInt = stoi(openProject);
+                openProjectInt = stoi(openProject);
                 if (count(userProjects.begin(), userProjects.end(), openProjectInt)) {
                     validProjectEntered = true;
                 }
-            } catch(...) {
+            } catch (...) {
                 cout << "Please enter the PID, a number." << endl;
             }
             cout << "Invalid PID, please try again." << endl;
         }
     }
-    iter = projects.begin();
+
     // IF it is in users projects, we know it is an existing project
-    while (iter != projects.end()) {
-        if (openProjectInt == ((iter->first).getProjectID())) {
-            (iter->first).displayProject(userName);
+    for (int i = 0; i < projects.size(); i++) {
+        if (openProjectInt == projects.at(i).getProjectID()) {
+            projects.at(i).displayProject(userName);
         }
     }
 }
+/*
+static void Jira::runTimer() {
+    std::cout << "Start\n";
+    while (true) {
+        this->time++;
+        this_thread::sleep_for(chrono::seconds(1));
+
+    }
+} */
+
+
+/*
+void Jira::saveJira(){
+        ofstream save;
+        cout << "Save Current State\n\n";
+        save.open("jira.txt");
+        if(save.is_open()) {
+            
+            }} */

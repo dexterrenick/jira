@@ -10,7 +10,7 @@ using namespace std;
 
 class Sprint {
 public:
-    Sprint(int, int, int, vector<Issue>);
+    Sprint(int, int, vector<Issue>);
     int getSprintID() {return sprintID;}
     void setSprintID(int given_ID) {sprintID = given_ID;}
     int getTimeFrame() {return timeFrame;}
@@ -18,7 +18,10 @@ public:
     int getTimeWorking() {return timeWorking;}
     void setTimeWorking(int given_time) {timeWorking = given_time;}   
     vector<Issue> getIssues () {return issues;}
+    
     void setIssues(vector<Issue> givenIssues) {givenIssues=issues;}
+    int getIssueSize();
+    Issue getIssueWithIndex(int index);
 
 
 private:

@@ -1,6 +1,6 @@
 IDIR =../include
-CC=g++
-CFLAGS= -I$(IDIR) -g -std=c++11 -O0
+CC=gcc
+CFLAGS= -I$(IDIR) -g -O0 -std=c++11
 
 ODIR=.
 
@@ -9,52 +9,21 @@ LIBS=-lncurses
 _DEPS = 
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ1 = issue.o
-_OBJ2 = jira.o
-_OBJ3 = main.o
-_OBJ4 = project.o
-_OBJ5 = sprint.o
-_OBJ6 = teamMember.o
+_OBJ = main.o jira.o sprint.o teamMember.o project.o issue.o
+OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
-
-
-$(ODIR)/%.o: %.cpp $(DEPS)
+$(ODIR)/%.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-all: issue jira main project sprint teamMember
-	
-issue: $(_OBJ1)
-	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
-
-jira: $(_OBJ2)
-	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
-
-main: $(_OBJ3)
-	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
-
-project: $(_OBJ4)
-	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
-
-sprint: $(_OBJ5)
-	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
-
-teamMember: $(_OBJ6)
-	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
-
-
-
-
+jira: $(OBJ)
+	g++ -o $@ $^ $(CFLAGS) $(LIBS)
 
 .PHONY: clean
 
 clean:
 	rm -f *~ core $(INCDIR)/*~ 
-	rm -f issue
-	rm -f jira
-	rm -f main
-	rm -f project
-	rm -f sprint
+	rm -f  jira
 	rm -f *.o
 
 etags: 
-	find . -type f -iname "*.[ch]" | xargs etags --append         
+	find . -type f -iname "*.[ch]" | xargs etags --append   
