@@ -16,6 +16,9 @@ public:
     string getUsername() {return username;}
     bool isMemberOf(vector<TeamMember> teammates);
     friend ostream& operator<<(ostream& out, const TeamMember& member);
+    TeamMember& operator=(const TeamMember& given_issue);
+    
+    
 private:
     // team member username
     string username;

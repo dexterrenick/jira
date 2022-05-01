@@ -20,21 +20,21 @@ class Issue {
         int completionPercent;
         string description;
         string comments;
-        TeamMember assignedTo;
+        TeamMember* assignedTo;
 
     public:
     Issue();
-        Issue(TeamMember assignedToMember);
+        Issue(TeamMember* assignedToMember);
         Issue(string given_pr, string given_status, string given_type,
-int given_created, int given_due, string given_description, string given_comments, TeamMember given_member);
+int given_created, int given_due, string given_description, string given_comments, TeamMember* given_member);
     int getIssueID() {return issueID;}
     void setIssueID(int given_issueID) {issueID = given_issueID;}
     string getPriority() {return priority;}
     void setPriority(string given_pr) {priority = given_pr;}
     string getStatus() {return status;}
     void setStatus(string given_status) {status = given_status;}
-    TeamMember getAssignedTo() {return assignedTo;}
-    void setAssignedTo(TeamMember given_member) {assignedTo = given_member;}
+    TeamMember* getAssignedTo() {return assignedTo;}
+    void setAssignedTo(TeamMember* given_member) {assignedTo = given_member;}
     string getType() {return type;}
     void setType(string given_type) {type = given_type;}
     int getCreatedDate() {return createdDate;}

@@ -44,6 +44,7 @@ public:
     vector<Sprint*> getInProgress() const {return inProgress;}
     // sets list of sprints currently in progress
     void setInProgress(vector<Sprint*> givenIP) {inProgress = givenIP;}
+    
 
     // gets list of issues that are done
     vector<Issue*> getDone() const {return done;}
@@ -66,13 +67,12 @@ public:
     void setTeamDevelopers(vector<TeamMember*> givenTeamDevelopers) {teamDevelopers = givenTeamDevelopers;}
 
     // saves current state to a text file
-    void saveState();
+    void saveProject();
 
     // Determines if a given user is a member of this project
     bool hasUser(string user);
     
     // functions to add:
-    //moveIssue(issueID)
     //createIssue(issueID)
     //deleteIssue(issueID) done
     //updateIssue(issueID)
@@ -83,15 +83,26 @@ public:
     // Returns string of users highest access level in given project
     string getUserRole(string currentUser);
 
-    void createIssue();
+    void createIssue(string member, vector<TeamMember*> allUsers);
 
     void deleteIssue(TeamMember owner, int issueID);
 
-    void updateIssue(TeamMember member, int issueID);
+    void deleteIssue(string member, int issueID);
 
-    void assignIssue(TeamMember member, TeamMember assignee, int issueID);
+    void assignIssue(string member, TeamMember* assignee, int issueID);
+
+    //check if the current username is in this project's lead team
+    bool isMemberOfProjectLeads(string member);
+
+    //check if the current username is in the developers
+    bool isMemberOfDevelopers(string member);
     
     friend ostream& operator<<(ostream& out, const Project& proj);
+
+    //Move issue from one place to another
+    void moveIssue(string member, int issueID);
+
+    void updateIssue(string member, int issueID);
 
 private:
     inline static int currentProject = 0;

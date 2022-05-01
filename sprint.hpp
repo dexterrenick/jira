@@ -25,6 +25,16 @@ public:
     Issue getIssueWithIndex(int index);
 
     friend ostream& operator<<(ostream& out, const Sprint& Sprint);
+
+    bool findIssue(int issueID);
+    
+    void deleteSprintIssue(int issueID);
+
+    void addIssue(Issue* i) {issues.push_back(i);}
+
+    void reassignSprintIssue(int issueID, TeamMember* assignee);
+
+    Issue* getIssue(int issueID);
     
 private:
     // Static variable for current sprint

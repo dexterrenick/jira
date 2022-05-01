@@ -64,6 +64,8 @@ public:
     //to log out and restart the sign in/sign up
     void logOut(vector<TeamMember*> &allUsers, vector<Project*> &allProjects);
     
+    void createIssueJira(vector<TeamMember*> allUsers, vector<Project*> allProjects);
+
     // Get time
     int getTime() const {return this->time;}
     // Get userName
@@ -76,6 +78,12 @@ public:
     // Get projects
     vector<TeamMember*> getUsers() const {return this->users;}
     void setUsers(vector<TeamMember*> givenUsers) {this->users = givenUsers;}
+
+    void deleteGivenIssue(vector<Project*> allProjects);
+    void moveGivenIssue(vector<Project*> allProjects);
+
+    void saveJira();
+
 };
 
 #endif

@@ -140,6 +140,15 @@ void Jira::displayJiraHome(vector<TeamMember*> &allUsers, vector<Project*> &allP
         else if(menuOption == 6) {
             createProject(allProjects);
         }
+
+        //Move Issue
+        else if(menuOption == 9) {
+            moveGivenIssue(allProjects);
+        }
+
+        else if(menuOption == 13) {
+            deleteGivenIssue(allProjects);
+        }
         
     }
 //    if(menuOption == 11) {
@@ -222,7 +231,8 @@ void Jira::displayUserGivenPj() {
 void Jira::createAccount(vector<TeamMember*> &allUsers, vector<Project*> &allProjects) {
     string newAcc;
     cout<<"Please enter the new username."<<endl;
-    cin>> newAcc;
+    cin.ignore();
+    getline(cin, newAcc);
 
     while(isUserUsed(newAcc)) {
         cout<<"The given username is unavailable. Please try again!"<<endl;
@@ -255,23 +265,29 @@ void Jira::logOut(vector<TeamMember*> &allUsers, vector<Project*> &allProjects) 
 
 void Jira::createProject(vector<Project*> &allProjects) {
     regex e ("^-?\\d+");
-    int toDoSize = -1;
-    int projectLeadSize = -1;
-    int developerSize = -1;
-    int deadline = -1;
+    string projectLeadSize = "-1";
+    string developerSize = "-1";
+    string deadline = "-1";
     string projName;
     cout<<"Please give the name of the project."<<endl;
+    cin.ignore();
     getline(cin, projName);
 
     
-    while (!(regex_match(deadline,e)) && deadline < 1) {
+    while (!(regex_match(deadline,e)) || stoi(deadline) < 1) {
         cout<<"Please give the duration of the project (number of days)."<<endl;
-        cin>>deadline;
+        getline(cin, deadline);
     }
 
-    while (!(regex_match(projectLeadSize,e)) && projectLeadSize < 1) {
-        cout<<"Please give the duration of the project (number of days)."<<endl;
-        cin>>projectLeadSize;
+
+
+    // Make sure that there are enough users for requested number of project leads
+    while (!(regex_match(projectLeadSize,e)) || stoi(projectLeadSize) < 1 || stoi(projectLeadSize) > users.size()) {
+        cout<<"Please give the number of leads you'd like on the project."<<endl;
+        getline(cin, projectLeadSize);
+        if ((regex_match(projectLeadSize,e)) && stoi(projectLeadSize) > users.size()) {
+            cout << "You do not have enough organization members for that many leads. You have: " << users.size() << " organization members." << endl;
+        }
     }
 
     cout<<"Please choose the following users to be your project lead(s)."<<endl;
@@ -283,67 +299,187 @@ void Jira::createProject(vector<Project*> &allProjects) {
     cout<<endl;
     
     vector<TeamMember*> prjLeads;
-    for(int l = 0; l < projectLeadSize; l++) {
-        cout<<"Please enter the name of the user for project lead."<<endl;
+    while (prjLeads.size() < stoi(projectLeadSize)) {
+        cout<<"Please enter the name of the user for project leads."<<endl;
         string name;
-        cin>>name;
+        getline(cin, name);
+        bool realUser = false;
         for(int i = 0; i < users.size(); i++) {
             if(name == users[i]->getUsername()) {
-                prjLeads.push_back(users[i]);
+                realUser = true;
+                // Make sure we haven't added them already
+                bool duplicate = false;
+                for (int j = 0; j < prjLeads.size(); j++) {
+                    if (prjLeads.at(j)->getUsername() == name) {
+                        duplicate = true;
+                    }
+                }
+                if (!duplicate) {
+                    prjLeads.push_back(users[i]);
+                } else {
+                    cout << "User already added." << endl;
+                }    
             }
         }
+        if (!realUser) {
+            cout << "Invalid username entered. Try again: " << endl;
+        }
     }
+
     
     cout<<"Project lead(s): ";
     for(int j = 0; j < prjLeads.size(); j++) {
         cout<<prjLeads[j]->getUsername()<<", ";
     }
     cout<<endl;
-    
-    cout<<"How many developer(s) do you want to include in this project?"<<endl;
-    cin>>developerSize;
 
+    // Make sure that there are enough users for requested number of project leads
+    while (!(regex_match(developerSize,e)) || stoi(developerSize) < 1 || stoi(developerSize) > users.size()) {
+        cout<<"How many developer(s) do you want to include in this project?"<<endl;
+        cin>>developerSize;
+    }
+    
     cout<<"Please choose the other users to be your developers."<<endl;
 
     vector<TeamMember*> developers;
-    for(int k = 0; k < developerSize; k++){
+    // Issues with input stream reading in \n after first try
+    bool firstTime = true;
+    while (developers.size() < stoi(developerSize)) {
         cout<<"Please enter the name of the user for developer."<<endl;
         string name;
-        cin>>name;
+        if (firstTime) {
+            cin.ignore();
+            firstTime = false;
+        }
+        getline(cin, name);
+        bool realUser = false;
         for(int i = 0; i < users.size(); i++) {
             if(name == users[i]->getUsername()) {
-                developers.push_back(users[i]);
+                realUser = true;
+                // Make sure we haven't added them already
+                bool duplicate = false;
+                for (int j = 0; j < developers.size(); j++) {
+                    if (developers.at(j)->getUsername() == name) {
+                        duplicate = true;
+                    }
+                }
+                if (!duplicate) {
+                    developers.push_back(users[i]);
+                } else {
+                    cout << "User already added." << endl;
+                }    
             }
         }
+        if (!realUser) {
+            cout << "Invalid username entered. Try again: " << endl;
+        }
     }
+
     cout<<"Team Developer(s): ";
     for(int i = 0; i < developers.size(); i++) {
         cout<<developers[i]->getUsername()<<", ";
     }
     cout<<endl;
 
-  vector<Sprint*> listOfSprints;
-  char another = 'y';
+    vector<Sprint*> listOfSprints;
+    string another = "y";
 
-   while(tolower(another) == 'y') {
+    while(tolower(another.at(0)) == 'y') {
     vector<Issue*> problems;
     Sprint* sprint1 = new Sprint(0, 0, problems);
-    int timeFrame;
-    cout<<"Please give a time frame for this sprint."<<endl;
-    cin>> timeFrame;
-    sprint1->setTimeFrame(timeFrame);
-
+    string timeFrame = "-1";
+    while (!(regex_match(timeFrame,e)) || stoi(timeFrame) < 1) {
+        cout<<"Please give a time frame for this sprint."<<endl;
+        getline(cin, timeFrame);
+    }
+    sprint1->setTimeFrame(stoi(timeFrame));
     listOfSprints.push_back(sprint1);
     cout<<"\nEnter another sprint? (y/n)"<<endl;
-    cin>>another;
-    cin.ignore();
+    getline(cin, another);
     cout<<endl;
-  }
-  vector<Issue*> listOfTodo;
-  vector<Issue*> listOfDone;
+    }
+    vector<Issue*> listOfTodo;
+    vector<Issue*> listOfDone;
 
-  Project* project1 = new Project(projName, deadline, listOfTodo, listOfSprints,listOfDone, this->userName, prjLeads, developers);
+    cout << "Project added." << endl;
+    Project* project1 = new Project(projName, stoi(deadline), listOfTodo, listOfSprints,listOfDone, this->userName, prjLeads, developers);
 
-  this->projects.push_back(project1);
+    this->projects.push_back(project1);
     allProjects = this->projects;
 }
+
+void Jira::createIssueJira(vector<TeamMember*> allUsers, vector<Project*> allProjects) {
+    int givenPID;
+    cout<<"Please provide the projectID that you want to create an issue"<<endl;
+    cin>>givenPID;
+    bool created = false;
+    
+    for(int i = 0; i <projects.size(); i++) {
+        if(givenPID == projects[i]->getProjectID()) {
+            projects[i]->createIssue(userName, allUsers);
+            created = true;
+        }
+    }
+    if(created == true) {
+        cout<<"Succesfully created an issue in this project!"<<endl;
+    }
+    else {
+        cout<<"Not successfully created an issue in this project!"<<endl;
+    }
+}
+void Jira::deleteGivenIssue(vector<Project*> allProjects) {
+    int givenPID;
+    cout<<"Please provide the projectID you want to delete its issue."<<endl;
+    cin>>givenPID;
+    
+    for(int i = 0; i < projects.size(); i++) {
+        if(givenPID == projects[i]->getProjectID()) {
+            int issueID;
+            cout<<"Please provide the issueID you want to delete."<<endl;
+            cin>> issueID;
+            projects[i]->deleteIssue(userName, issueID);
+        }
+    }
+    allProjects = this->projects;
+}
+
+void Jira::moveGivenIssue(vector<Project*> allProjects) {
+    int givenPID;
+    cout<<"Please provide the projectID you want to move its issue."<<endl;
+    cin>>givenPID;
+    
+    for(int i = 0; i < projects.size(); i++) {
+        if(givenPID == projects[i]->getProjectID()) {
+            int issueID;
+            cout<<"Please provide the issueID you want to move."<<endl;
+            cin>> issueID;
+            projects[i]->moveIssue(userName, issueID);
+        }
+    }
+    allProjects = this->projects;
+}
+
+// saves current state of the project
+void Jira::saveJira(){
+        ofstream jira;
+        cout << "Save Current State\n\n";
+        jira.open("jira.txt");
+        if(jira.is_open()) {
+            jira << "Time: " << time << endl;
+            jira << "Username: " << userName;
+    vector<TeamMember*> users;
+    for (int i = 0; i < projects.size(); i++) {
+            jira << "Projects : " << endl;
+            projects[i]->saveProject();
+          }
+          for (int i = 0; i < users.size(); i++) {
+              jira << "Users: " << users[i]->getUsername() << endl;}
+ 
+     }
+     jira.close();
+}
+
+/*string savedOutput = ""
+for (projec : projects) {
+    savedOutput += project.getSave()
+}*/

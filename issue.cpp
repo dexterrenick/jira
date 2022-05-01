@@ -11,7 +11,7 @@ Issue::Issue() {
     currentIssue++;
     this->priority = "";
     this->status = "";
-    this->assignedTo = TeamMember("");
+    this->assignedTo = new TeamMember();
     this->type = "";
     this->createdDate = 0;
     this->dueDate = 0;
@@ -20,7 +20,7 @@ Issue::Issue() {
     this->comments = "";
 }
 
-Issue::Issue(TeamMember assignedToMember) {
+Issue::Issue(TeamMember* assignedToMember) {
     this->issueID = currentIssue;
     currentIssue++;
     this->priority = "";
@@ -36,7 +36,7 @@ Issue::Issue(TeamMember assignedToMember) {
 }
 Issue::Issue(string given_pr, string given_status, string given_type,
 int given_created, int given_due, string given_description, string given_comments,
-TeamMember given_member) {
+TeamMember* given_member) {
     this->issueID = currentIssue;
     currentIssue++;
     this->priority = given_pr;
@@ -69,7 +69,7 @@ ostream& operator<<(ostream& out, const Issue& issue) {
     out<<"IssueID: "<<issue.issueID<<endl;
     out<<"Priority: "<<issue.priority<<endl;
     out<<"Status: "<<issue.priority<<endl;
-    out<<"AssignedTo: "<<issue.assignedTo<<endl;
+    out<<"AssignedTo: "<<*issue.assignedTo<<endl;
     out<<"Type: "<<issue.type<<endl;
     out<<"CreatedDate: "<<issue.createdDate<<endl;
     out<<"DueDate: "<<issue.dueDate<<endl;

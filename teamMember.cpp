@@ -27,3 +27,9 @@ ostream& operator<<(ostream& out, const TeamMember& member) {
     out<<member.username;
     return out;
 }
+
+TeamMember& TeamMember::operator=(const TeamMember& given_issue) {
+    this->username = given_issue.username;
+
+    return *this;
+}

@@ -41,12 +41,12 @@ int main() {
     docsDevelop.push_back(fenix);
     docsDevelop.push_back(harry);
     
-    Issue* docsIss1 = new Issue(*emily);
-    Issue* docsIss2 = new Issue(*fenix);
-    Issue* docsIss3 = new Issue(*harry);
-    Issue* docsIss4 = new Issue(*charles);
-    Issue* docsIss5 = new Issue(*ben);
-    Issue* docsIss6 = new Issue(*alex);
+    Issue* docsIss1 = new Issue(emily);
+    Issue* docsIss2 = new Issue(fenix);
+    Issue* docsIss3 = new Issue(harry);
+    Issue* docsIss4 = new Issue(charles);
+    Issue* docsIss5 = new Issue(ben);
+    Issue* docsIss6 = new Issue(alex);
     
     vector<Issue*> docsloITodo;
     docsloITodo.push_back(docsIss4);
