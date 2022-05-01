@@ -22,3 +22,8 @@ bool TeamMember::isMemberOf(vector<TeamMember> teammates) {
     }
     return found;
 }
+
+ostream& operator<<(ostream& out, const TeamMember& member) {
+    out<<member.username;
+    return out;
+}

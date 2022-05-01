@@ -10,8 +10,10 @@
 #include <stdio.h>
 #include <string>
 #include <map>
+#include <cctype>
 #include <vector>
 #include "teamMember.hpp"
+#include "project.hpp"
 #include "issue.hpp"
 #include "sprint.hpp"
 
@@ -20,47 +22,61 @@ using namespace std;
 class Jira {
 protected:
     // Time can be static because there won't be two jira applications
-    static int time;
+    int time;
     string userName;
-    vector<Project> projects; 
-    vector<TeamMember> users;
+    vector<Project*> projects;
+    vector<TeamMember*> users;
 
 public:
     // Empty constructor for a new Jira Program if one doesn't exist yet
     Jira();
     // If there is an existing Jira Program, read in data
-    Jira(int time, vector<Project> projects, vector<TeamMember> users);
+    Jira(int time, string currentUser, vector<Project*> projects, vector<TeamMember*> users);
     // Destructor that saves all relevant data when program closes
     ~Jira();
     // Copy constructor
     Jira(const Jira &j);
     // Allows project owner to make new prjoect
-    void createProject(TeamMember owner);
+    void createProject(vector<Project*> &allProjects);
     // Allows user to create an account if they do not yet have one
-    void createAccount();
+    void createAccount(vector<TeamMember*> &allUsers, vector<Project*> &allProjects);
     // Allows user to sign in if they already have an account
-    void signIn();
+    void signIn(vector<TeamMember*> &allUsers, vector<Project*> &allProjects);
     // Saves user out to users.txt when program closes
     void saveUsers();
     // Increment's the time by one
     void incrementTime();
     // Homepage for jira to access various parts of the project
-    void displayJiraHome();
+    void displayJiraHome(vector<TeamMember*> &allUsers, vector<Project*> &allProjects);
+    //check if the given username is available or not
+    bool isUserUsed(string givenUsername);
     // Allows user option to sign in or up for jira account
-    void displaySignInUp();
+    void displaySignInUp(vector<TeamMember*> &allUsers, vector<Project*> &allProjects);
     // Timer to run asynchronously to control project time
-    // static void runTimer();
+    static void runTimer();
+    
+    //print the projects the user is involved in
+    void displayUserPj();
+    
+    //print the specific project the user is involved in and wants to see
+    void displayUserGivenPj();
+    
+    //to log out and restart the sign in/sign up
+    void logOut(vector<TeamMember*> &allUsers, vector<Project*> &allProjects);
+    
     // Get time
     int getTime() const {return this->time;}
     // Get userName
-    string getUsername() const {return this->userName;}
+    string getUserName() const {return this->userName;}
+    void setUserName(string given_email) {this->userName = given_email;}
     // Get projects
-    vector<Project> getProjects() const {return this->projects;}
+    vector<Project*> getProjects() const {return this->projects;}
+    
+    void setProjects(vector<Project*> givenP) {this->projects = givenP;}
     // Get projects
-    vector<TeamMember> getUsers() const {return this->users;}
-
-    // save current state of Jira to a text file
-    void saveJira();
+    vector<TeamMember*> getUsers() const {return this->users;}
+    void setUsers(vector<TeamMember*> givenUsers) {this->users = givenUsers;}
 };
 
 #endif
+

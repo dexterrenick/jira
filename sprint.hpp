@@ -6,24 +6,26 @@
 #include <string>
 #include <vector>
 #include "issue.hpp"
+
 using namespace std;
 
 class Sprint {
 public:
-    Sprint(int, int, vector<Issue>);
+    Sprint(int, int, vector<Issue*>);
     int getSprintID() {return sprintID;}
     void setSprintID(int given_ID) {sprintID = given_ID;}
     int getTimeFrame() {return timeFrame;}
     void setTimeFrame(int given_timeFrame) {timeFrame = given_timeFrame;}
     int getTimeWorking() {return timeWorking;}
-    void setTimeWorking(int given_time) {timeWorking = given_time;}   
-    vector<Issue> getIssues () {return issues;}
+    void setTimeWorking(int given_time) {timeWorking = given_time;}
+    vector<Issue*> getIssues () {return issues;}
     
-    void setIssues(vector<Issue> givenIssues) {givenIssues=issues;}
+    void setIssues(vector<Issue*> givenIssues) {givenIssues=issues;}
     int getIssueSize();
     Issue getIssueWithIndex(int index);
 
-
+    friend ostream& operator<<(ostream& out, const Sprint& Sprint);
+    
 private:
     // Static variable for current sprint
     inline static int currentSprint = 0;
@@ -35,7 +37,7 @@ private:
     int timeWorking;
 
     // list of issues in the sprint
-    vector<Issue> issues;
+    vector<Issue*> issues;
 };
 
 #endif
