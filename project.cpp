@@ -887,3 +887,122 @@ void Project::dumpSprint(int sprintID) {
         }
     }
 }
+void Project::addLeadProject(vector<TeamMember*> allUsers) {
+    string newLead;
+    cout<<"Please provide the name of the member you want to add as project lead?"<<endl;
+    cin>>newLead;
+    
+    if(isMemberOfDevelopers(newLead)) {
+        cout<<"This person is in your developer teams"<<endl;
+        cout<<"Do you want to change this member's role to project lead? (y/n)"<<endl;
+        string decision;
+        cin>>decision;
+        if(decision == "y" || decision == "Y") {
+            for(int i = 0; i < teamDevelopers.size(); i++) {
+                if(teamDevelopers[i]->getUsername() == newLead) {
+                    vector<TeamMember*> newProjectLeads = this->getProjectLeads();
+                    newProjectLeads.push_back(teamDevelopers[i]);
+                    setProjectLeads(newProjectLeads);
+                    cout<<"Successfully added "<<newLead <<" to project leads."<<endl;
+                    teamDevelopers.erase(teamDevelopers.begin() + i);
+                    cout<<"Successfully removed "<<newLead <<" in the developer team."<<endl;
+                }
+            }
+        }
+    }
+    else if(isMemberOfProjectLeads(newLead)) {
+        cout<<"This member is your project lead."<<endl;
+    }
+    else {
+        for(int i = 0; i < allUsers.size(); i++) {
+            if(newLead == allUsers[i]->getUsername()) {
+                vector<TeamMember*> newProjectLeads = this->getProjectLeads();
+                newProjectLeads.push_back(allUsers[i]);
+                setProjectLeads(newProjectLeads);
+            }
+        }
+    }
+}
+
+void Project::removeLeadProject() {
+    cout<<"Here is the list of the project leads in this project"<<endl;
+    for(int i = 0; i < projectLeads.size(); i++) {
+        cout<<projectLeads[i]->getUsername()<<", ";
+    }
+    cout<<endl;
+    string removeLead;
+    cout<<"Please provide the name of the member you want to remove in the project leads?"<<endl;
+    cin>>removeLead;
+    
+    if(isMemberOfProjectLeads(removeLead)) {
+        for(int i = 0; i < projectLeads.size(); i++) {
+            if(projectLeads[i]->getUsername() == removeLead) {
+                projectLeads.erase(projectLeads.begin() + i);
+                cout<<"Succesfully removed "<<removeLead<<" in the project leads"<<endl;
+            }
+        }
+    }
+    else {
+        cout<<"This given user is not in your project leads"<<endl;
+    }
+}
+
+void Project::addDeveloper(vector<TeamMember*> allUsers) {
+    string newDevel;
+    cout<<"Please provide the name of the member you want to add as developer?"<<endl;
+    cin>>newDevel;
+    
+    if(isMemberOfProjectLeads(newDevel)) {
+        cout<<"This person is in your project lead"<<endl;
+        cout<<"Do you want to change this member's role to developer (y/n)"<<endl;
+        string decision;
+        cin>>decision;
+        if(decision == "y" || decision == "Y") {
+            for(int i = 0; i < projectLeads.size(); i++) {
+                if(projectLeads[i]->getUsername() == newDevel) {
+                    vector<TeamMember*> newDeveloper = this->getTeamDevelopers();
+                    newDeveloper.push_back(projectLeads[i]);
+                    setTeamDevelopers(newDeveloper);
+                    cout<<"Successfully added "<<newDevel <<" to developer team."<<endl;
+                    projectLeads.erase(projectLeads.begin() + i);
+                    cout<<"Successfully removed "<<newDevel <<" in the project lead."<<endl;
+                }
+            }
+        }
+    }
+    else if(isMemberOfDevelopers(newDevel)) {
+        cout<<"This person is in your developer team"<<endl;
+    }
+    else {
+        for(int i = 0; i < allUsers.size(); i++) {
+            if(newDevel == allUsers[i]->getUsername()) {
+                vector<TeamMember*> newDeveloper = this->getTeamDevelopers();
+                newDeveloper.push_back(allUsers[i]);
+                setTeamDevelopers(newDeveloper);
+            }
+        }
+    }
+}
+
+void Project::removeDeveloper() {
+    cout<<"Here is the list of the developer in this project"<<endl;
+    for(int i = 0; i < teamDevelopers.size(); i++) {
+        cout<<teamDevelopers[i]->getUsername()<<", ";
+    }
+    cout<<endl;
+    string removeDev;
+    cout<<"Please provide the name of the member you want to remove in the team developers?"<<endl;
+    cin>>removeDev;
+    
+    if(isMemberOfDevelopers(removeDev)) {
+        for(int i = 0; i < teamDevelopers.size(); i++) {
+            if(teamDevelopers[i]->getUsername() == removeDev) {
+                teamDevelopers.erase(teamDevelopers.begin() + i);
+                cout<<"Succesfully removed "<<removeDev<<" in the team developer"<<endl;
+            }
+        }
+    }
+    else {
+        cout<<"This given user is not in your team developer"<<endl;
+    }
+}

@@ -19,6 +19,7 @@
 
 using namespace std;
 
+//default construtor
 Jira::Jira() {
     this->time = 0;
     this->userName = "";
@@ -26,6 +27,7 @@ Jira::Jira() {
     users = vector<TeamMember*>();
 }
 
+//delegating constructor
 Jira::Jira(int time, string currentUser, vector<Project*> projects, vector<TeamMember*> users) {
     this->time = time;
     this->projects = projects;
@@ -34,6 +36,7 @@ Jira::Jira(int time, string currentUser, vector<Project*> projects, vector<TeamM
     this->userName = currentUser;
 }
 
+//
 Jira::Jira(const Jira &j) {
     time = j.getTime();
     userName = j.getUserName();
@@ -88,7 +91,7 @@ void Jira::displaySignInUp() {
 void Jira::displayJiraHome() {
     int menuOption = 0;
     
-    while(menuOption != 15) {
+    while(menuOption != 14) {
         cout<<endl;
         cout << "Current Time: " << getTime() << endl;
         cout<<"These are menu options. -------------------"<<endl;
@@ -98,19 +101,19 @@ void Jira::displayJiraHome() {
         cout<<"4) View all of your projects. "<<endl;
         cout<<"5) View specific project and its details. "<<endl;
         cout<<"6) Create new project (you will be the project owner for this project)."<<endl;
-        cout<<"8) Create new issue. "<<endl;
-        cout<<"9) Work on issue. (Sprint simulation)."<<endl;
-        cout<<"10) Update your project status. "<<endl;
-        cout<<"11) Update your issue status. "<<endl;
-        cout<<"12) Assign a member to an issue."<<endl; 
-        cout<<"13) Delete your project. "<<endl;
-        cout<<"14) Delete your issue. "<<endl;
-        cout<<"15) Quit (would not save the current project, please save if needed). "<<endl;
+        cout<<"7) Create new issue. "<<endl;
+        cout<<"8) Work on issue. (Sprint simulation)."<<endl;
+        cout<<"9) Update your project status. "<<endl;
+        cout<<"10) Update your issue status. "<<endl;
+        cout<<"11) Assign a member to an issue."<<endl;
+        cout<<"12) Delete your project. "<<endl;
+        cout<<"13) Delete your issue. "<<endl;
+        cout<<"14) Quit (would not save the current project, please save if needed). "<<endl;
         updateAllStatus();
         
         cin>>menuOption;
         
-        while(menuOption > 15 || menuOption < 1) {
+        while(menuOption > 14 || menuOption < 1) {
             cout<< "Please select a menu option.\n";
             cin>> menuOption;
         }
@@ -142,21 +145,28 @@ void Jira::displayJiraHome() {
         else if(menuOption == 6) {
             createProject();
         }
+        else if(menuOption == 7) {
+            createIssueJira();
+        }
 
         //Move Issue
-        else if(menuOption == 9) {
+        else if(menuOption == 8) {
             sprintSimulation();
         }
-        else if(menuOption == 11) {
+        
+        else if (menuOption == 9) {
+            updateGivenProject();
+        }
+        else if(menuOption == 10) {
             updateIssueJira();
         }
-        else if(menuOption == 12) {
+        else if(menuOption == 11) {
             assignIssueJira();
         }
-        else if(menuOption == 13) {
+        else if(menuOption == 12) {
             deleteGivenProject();
         }
-        else if(menuOption == 14) {
+        else if(menuOption == 13) {
             deleteGivenIssue();
         }
     }
@@ -500,15 +510,15 @@ void Jira::sprintSimulation() {
         cin.clear();
         cout << "1) Work on issues (increases current time)" << endl; 
         cout << "2) Move issue" << endl; 
-        while (option != "1" || option != "2") {
-            cout << "Enter your option: " << endl;
-            cin >> option;
-            cout << option;
-        }
+        cout << "3) Exit" << endl; 
+        cout << "Enter your option: " << endl;
+        cin >> option;
         if (option == "1") {
             incrementTime();
-        } else {
+        } else if (option == "2") {
             moveGivenIssue();
+        } else {
+            run = false;
         }
         updateAllStatus();
     }
@@ -659,5 +669,83 @@ void Jira::deleteGivenProject() {
     }
     else {
         cout<<"Not successfully deleted this project."<<endl;
+    }
+}
+
+void Jira::updateGivenProject() {
+    bool updated = false;
+    int givenPID;
+    vector<Project*> userProjs;
+    
+    for(int i = 0; i < projects.size(); i++) {
+        if(projects[i]->getProjectOwner().getUsername() == this->userName || projects[i]->isMemberOfProjectLeads(userName)) {
+            userProjs.push_back(projects[i]);
+        }
+    }
+
+    cout<<"All of the projects you are project owner or project lead: ";
+    for(int i = 0; i < userProjs.size(); i++) {
+        cout<<*userProjs[i]<<", ";
+    }
+    cout<<endl;
+    cout<<"Please provide the projectID that you want to update?"<<endl;
+    cin>>givenPID;
+    
+    for(int i = 0; i < projects.size(); i++) {
+        if(projects[i]->getProjectID() == givenPID && ((projects[i]->getProjectOwner().getUsername() == this->userName) || (projects[i]->isMemberOfProjectLeads(userName)))) {
+            cout<<"What you want to update?"<<endl;
+            cout<<"ProjectName (N), Deadline (D), assign Project Leads (L), assign Developers (DV)"<<endl;
+            string selection;
+            cin>>selection;
+            if(selection == "N" || selection == "n") {
+                string newName;
+                cout<<"Please write new project name"<<endl;
+                cin>>newName;
+                projects[i]->setProjectName(newName);
+                cout<<"New Name "<<projects[i]->getProjectName()<<" is updated!"<<endl;
+                updated = true;
+            }
+            else if(selection == "D" || selection == "d") {
+                cout<<"Please enter new deadline (numbers of days)"<<endl;
+                int newDeadline;
+                cin>>newDeadline;
+                projects[i]->setProjectDeadline(newDeadline);
+                cout<<"New deadline: "<<projects[i]->getProjectDeadline()<<" is updated!"<<endl;
+                updated = true;
+            }
+            else if(selection == "L" || selection == "l") {
+                string decision;
+                cout<<"Do you want to add new project lead (A) or remove a project lead (R)"<<endl;
+                cin>>decision;
+                if(decision == "A" || decision == "a") {
+                    projects[i]->addLeadProject(this->users);
+                    updated = true;
+                }
+                else if(decision == "R" || decision == "r") {
+                    projects[i]->removeLeadProject();
+                    updated = true;
+                }
+            }
+            
+            else if(selection == "DV" || selection == "dv") {
+                string decision;
+                cout<<"Do you want to add new developer (A) or remove a developer (R)"<<endl;
+                cin>>decision;
+                if(decision == "A" || decision == "a") {
+                    projects[i]->addDeveloper(this->users);
+                    updated = true;
+                }
+                else if(decision == "R" || decision == "r") {
+                    projects[i]->removeDeveloper();
+                    updated = true;
+                }
+            }
+        }
+    }
+    if(updated == true) {
+        cout<<"Successfully updated this project."<<endl;
+    }
+    else {
+        cout<<"Not successfully updated this project."<<endl;
     }
 }

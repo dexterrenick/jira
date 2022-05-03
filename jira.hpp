@@ -89,6 +89,7 @@ public:
 
     void updateIssueJira();
 
+    void updateGivenProject();
     void saveJira();
 
     // Simulates working on working on a sprint

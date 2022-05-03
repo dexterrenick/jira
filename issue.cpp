@@ -6,6 +6,7 @@
 
 using namespace std;
 
+//default constructor
 Issue::Issue() {
     this->issueID = currentIssue;
     currentIssue++;
@@ -20,6 +21,7 @@ Issue::Issue() {
     this->comments = "";
 }
 
+//delegating constructor but only username
 Issue::Issue(TeamMember* assignedToMember) {
     this->issueID = currentIssue;
     currentIssue++;
@@ -34,6 +36,8 @@ Issue::Issue(TeamMember* assignedToMember) {
     this->comments = "";
     
 }
+
+//delegating consturctor
 Issue::Issue(string given_pr, string given_status, string given_type,
 int given_created, int given_due, string given_description, string given_comments,
 TeamMember* given_member) {
@@ -50,6 +54,7 @@ TeamMember* given_member) {
     this->assignedTo = given_member;
 }
 
+//delegating constructor
 Issue::Issue(int given_issueID, string given_pr, string given_status, string given_type,
 int given_created, int given_due, string given_description, string given_comments,
 TeamMember* given_member) {
@@ -65,6 +70,7 @@ TeamMember* given_member) {
     this->assignedTo = given_member;
 }
 
+//assignment operator
 Issue& Issue::operator=(const Issue& given_issue) {
     this->issueID = given_issue.currentIssue;
     this->priority = given_issue.priority;
@@ -80,6 +86,7 @@ Issue& Issue::operator=(const Issue& given_issue) {
     return *this;
 }
 
+//cout operator
 ostream& operator<<(ostream& out, const Issue& issue) {
     if (issue.status != "done") {
         out<<"IssueID: "<<issue.issueID<<endl;

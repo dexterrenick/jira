@@ -112,6 +112,14 @@ public:
     // opens text file and updates project based on given textfile
     void openProject();
 
+    void addLeadProject(vector<TeamMember*> allUsers);
+    
+    void removeLeadProject();
+    
+    void addDeveloper(vector<TeamMember*> allUsers);
+    
+    void removeDeveloper();
+
 private:
     inline static int currentProject = 0;
     // defines project ID
