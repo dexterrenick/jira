@@ -41,7 +41,7 @@ Jira::Jira(const Jira &j) {
     users = j.getUsers();
 }
 
-void Jira::signIn(vector<TeamMember*> &allUsers, vector<Project*> &allProjects) {
+void Jira::signIn() {
     string userEmail, myText;
     cout <<"Enter username: " << endl;
     cin >> userEmail;
@@ -55,17 +55,17 @@ void Jira::signIn(vector<TeamMember*> &allUsers, vector<Project*> &allProjects) 
     
     if(found == true) {
         this->setUserName(userEmail);
-        displayJiraHome(allUsers, allProjects);
+        displayJiraHome();
     }
     else {
         cout<<"Users not found."<<endl;
         cout<<"Please sign up."<<endl;
-        createAccount(allUsers, allProjects);
+        createAccount();
 
     }
 }
 
-void Jira::displaySignInUp(vector<TeamMember*> &allUsers, vector<Project*> &allProjects) {
+void Jira::displaySignInUp() {
     int option = 0;
     cout << "1) Sign in" << endl;
     cout << "2) Sign up" << endl;
@@ -77,19 +77,20 @@ void Jira::displaySignInUp(vector<TeamMember*> &allUsers, vector<Project*> &allP
         cin >> option;
     }
     if (option == 1) {
-        signIn(allUsers, allProjects);
+        signIn();
     }
     else {
-        createAccount(allUsers, allProjects);
+        createAccount();
     }
 }
 
 
-void Jira::displayJiraHome(vector<TeamMember*> &allUsers, vector<Project*> &allProjects) {
+void Jira::displayJiraHome() {
     int menuOption = 0;
     
-    while(menuOption != 14) {
+    while(menuOption != 15) {
         cout<<endl;
+        cout << "Current Time: " << getTime() << endl;
         cout<<"These are menu options. -------------------"<<endl;
         cout<<"1) Load previous projects. "<<endl;
         cout<<"2) Save current projects. "<<endl;
@@ -97,18 +98,19 @@ void Jira::displayJiraHome(vector<TeamMember*> &allUsers, vector<Project*> &allP
         cout<<"4) View all of your projects. "<<endl;
         cout<<"5) View specific project and its details. "<<endl;
         cout<<"6) Create new project (you will be the project owner for this project)."<<endl;
-        cout<<"7) View specific issue and its details. "<<endl;
         cout<<"8) Create new issue. "<<endl;
-        cout<<"9) Work on issue. (Sprint stimulation)."<<endl;
+        cout<<"9) Work on issue. (Sprint simulation)."<<endl;
         cout<<"10) Update your project status. "<<endl;
         cout<<"11) Update your issue status. "<<endl;
-        cout<<"12) Delete your project. "<<endl;
-        cout<<"13) Delete your issue. "<<endl;
-        cout<<"14) Quit (would not save the current project, please save if needed). "<<endl;
+        cout<<"12) Assign a member to an issue."<<endl; 
+        cout<<"13) Delete your project. "<<endl;
+        cout<<"14) Delete your issue. "<<endl;
+        cout<<"15) Quit (would not save the current project, please save if needed). "<<endl;
+        updateAllStatus();
         
         cin>>menuOption;
         
-        while(menuOption > 14 || menuOption < 1) {
+        while(menuOption > 15 || menuOption < 1) {
             cout<< "Please select a menu option.\n";
             cin>> menuOption;
         }
@@ -122,8 +124,8 @@ void Jira::displayJiraHome(vector<TeamMember*> &allUsers, vector<Project*> &allP
         
         //Log out.
         else if(menuOption == 3) {
-            logOut(allUsers, allProjects);
-            displaySignInUp(allUsers, allProjects);
+            logOut();
+            displaySignInUp();
         }
         
         //View all of your projects.
@@ -138,18 +140,25 @@ void Jira::displayJiraHome(vector<TeamMember*> &allUsers, vector<Project*> &allP
         
         //Create new project.
         else if(menuOption == 6) {
-            createProject(allProjects);
+            createProject();
         }
 
         //Move Issue
         else if(menuOption == 9) {
-            moveGivenIssue(allProjects);
+            sprintSimulation();
         }
-
+        else if(menuOption == 11) {
+            updateIssueJira();
+        }
+        else if(menuOption == 12) {
+            assignIssueJira();
+        }
         else if(menuOption == 13) {
-            deleteGivenIssue(allProjects);
+            deleteGivenProject();
         }
-        
+        else if(menuOption == 14) {
+            deleteGivenIssue();
+        }
     }
 //    if(menuOption == 11) {
 //        exit(0);
@@ -228,7 +237,7 @@ void Jira::displayUserGivenPj() {
 //to create new account and update vector of teamMembers in Jira and main
 //if successfully created acc, user will go to displayJiraHome
 //else continue enter new username
-void Jira::createAccount(vector<TeamMember*> &allUsers, vector<Project*> &allProjects) {
+void Jira::createAccount() {
     string newAcc;
     cout<<"Please enter the new username."<<endl;
     cin.ignore();
@@ -240,10 +249,10 @@ void Jira::createAccount(vector<TeamMember*> &allUsers, vector<Project*> &allPro
         cin>> newAcc;
     }
     TeamMember* newUser = new TeamMember(newAcc);
-    allUsers.push_back(newUser);
+    this->users.push_back(newUser);
     users.push_back(newUser);
     cout<<"Successfully created new account."<<endl;
-    displayJiraHome(allUsers, allProjects);
+    displayJiraHome();
 }
 
 
@@ -257,13 +266,11 @@ bool Jira::isUserUsed(string givenUsername) {
     return unavailable;
 }
 
-void Jira::logOut(vector<TeamMember*> &allUsers, vector<Project*> &allProjects) {
+void Jira::logOut() {
     this->userName = "";
-    allUsers = this->users;
-    allProjects = this->projects;
 }
 
-void Jira::createProject(vector<Project*> &allProjects) {
+void Jira::createProject() {
     regex e ("^-?\\d+");
     string projectLeadSize = "-1";
     string developerSize = "-1";
@@ -389,10 +396,10 @@ void Jira::createProject(vector<Project*> &allProjects) {
     Sprint* sprint1 = new Sprint(0, 0, problems);
     string timeFrame = "-1";
     while (!(regex_match(timeFrame,e)) || stoi(timeFrame) < 1) {
-        cout<<"Please give a time frame for this sprint."<<endl;
+        cout<<"Please give a due date for this sprint."<<endl;
         getline(cin, timeFrame);
     }
-    sprint1->setTimeFrame(stoi(timeFrame));
+    sprint1->setDueDate(stoi(timeFrame));
     listOfSprints.push_back(sprint1);
     cout<<"\nEnter another sprint? (y/n)"<<endl;
     getline(cin, another);
@@ -405,10 +412,9 @@ void Jira::createProject(vector<Project*> &allProjects) {
     Project* project1 = new Project(projName, stoi(deadline), listOfTodo, listOfSprints,listOfDone, this->userName, prjLeads, developers);
 
     this->projects.push_back(project1);
-    allProjects = this->projects;
 }
 
-void Jira::createIssueJira(vector<TeamMember*> allUsers, vector<Project*> allProjects) {
+void Jira::createIssueJira() {
     int givenPID;
     cout<<"Please provide the projectID that you want to create an issue"<<endl;
     cin>>givenPID;
@@ -416,7 +422,7 @@ void Jira::createIssueJira(vector<TeamMember*> allUsers, vector<Project*> allPro
     
     for(int i = 0; i <projects.size(); i++) {
         if(givenPID == projects[i]->getProjectID()) {
-            projects[i]->createIssue(userName, allUsers);
+            projects[i]->createIssue(userName, this->users);
             created = true;
         }
     }
@@ -427,7 +433,7 @@ void Jira::createIssueJira(vector<TeamMember*> allUsers, vector<Project*> allPro
         cout<<"Not successfully created an issue in this project!"<<endl;
     }
 }
-void Jira::deleteGivenIssue(vector<Project*> allProjects) {
+void Jira::deleteGivenIssue() {
     int givenPID;
     cout<<"Please provide the projectID you want to delete its issue."<<endl;
     cin>>givenPID;
@@ -440,10 +446,9 @@ void Jira::deleteGivenIssue(vector<Project*> allProjects) {
             projects[i]->deleteIssue(userName, issueID);
         }
     }
-    allProjects = this->projects;
 }
 
-void Jira::moveGivenIssue(vector<Project*> allProjects) {
+void Jira::moveGivenIssue() {
     int givenPID;
     cout<<"Please provide the projectID you want to move its issue."<<endl;
     cin>>givenPID;
@@ -456,7 +461,6 @@ void Jira::moveGivenIssue(vector<Project*> allProjects) {
             projects[i]->moveIssue(userName, issueID);
         }
     }
-    allProjects = this->projects;
 }
 
 // saves current state of the project
@@ -470,16 +474,190 @@ void Jira::saveJira(){
     vector<TeamMember*> users;
     for (int i = 0; i < projects.size(); i++) {
             jira << "Projects : " << endl;
-            projects[i]->saveProject();
+            projects[i]->savedOutput();
           }
           for (int i = 0; i < users.size(); i++) {
-              jira << "Users: " << users[i]->getUsername() << endl;}
+              jira << "Users: " << endl;
+              jira << users[i]->getUsername() << endl;}
  
      }
      jira.close();
 }
 
+// opens current state of the project based on text file
+void Jira::openJira(){}
+
 /*string savedOutput = ""
 for (projec : projects) {
     savedOutput += project.getSave()
 }*/
+
+void Jira::sprintSimulation() {
+    bool run = true;
+    cout << getTime() << endl;
+    string option = "";
+    while (run) {
+        cin.clear();
+        cout << "1) Work on issues (increases current time)" << endl; 
+        cout << "2) Move issue" << endl; 
+        while (option != "1" || option != "2") {
+            cout << "Enter your option: " << endl;
+            cin >> option;
+            cout << option;
+        }
+        if (option == "1") {
+            incrementTime();
+        } else {
+            moveGivenIssue();
+        }
+        updateAllStatus();
+    }
+}
+
+void Jira::updateAllStatus() {
+    // Handle sprints first in case anything gets sent back to todo
+    for (int i = 0; i < projects.size(); i++) {
+        for (int j = 0; j < projects.at(i)->getInProgress().size(); j++) {
+            // If sprint is due, dump all items into todo
+            if (this->time > projects.at(i)->getInProgress().at(j)->getDueDate()) {
+                projects.at(i)->dumpSprint(projects.at(i)->getInProgress().at(j)->getSprintID());
+            } 
+            else {
+                for (int k = 0; k < projects.at(i)->getInProgress().at(j)->getIssues().size(); k++) {
+                    if (projects.at(i)->getInProgress().at(j)->getIssues().at(k)->getCurrentTime() > this->time) {
+                        projects.at(i)->getInProgress().at(j)->getIssues().at(k)->setStatus("overdue");
+                    } else {
+                        projects.at(i)->getInProgress().at(j)->getIssues().at(k)->setStatus("in progress");
+                    }
+                    projects.at(i)->getInProgress().at(j)->getIssues().at(k)->setCurrentTime(this->time);
+                }
+            }
+        }
+        // Handle todo items
+        for (int j = 0; j < projects.at(i)->getTodo().size(); j++) {
+            projects.at(i)->getTodo().at(j)->setCurrentTime(time);
+            if (projects.at(i)->getTodo().at(j)->getCurrentTime() > this->time) {
+                projects.at(i)->getTodo().at(j)->setStatus("overdue");
+            } else {
+                projects.at(i)->getTodo().at(j)->setStatus("open");
+            }
+            projects.at(i)->getTodo().at(j)->setCurrentTime(this->time);
+        }
+        // We don't need to handle done items because we don't need to update their time because it isn't displayed
+    }
+}
+
+
+//assign a member to an issue
+void Jira::assignIssueJira() {
+    bool assigned = false;
+    int givenPID, issueID;
+    string assignee;
+    TeamMember* assigneeMember = new TeamMember();
+    vector<Project*> userProjs;
+    
+    for(int i = 0; i < projects.size(); i++) {
+        if(projects[i]->hasUser(this->userName)) {
+            userProjs.push_back(projects[i]);
+        }
+    }
+
+    cout<<"All of the projects you are involved: ";
+    for(int i = 0; i < userProjs.size(); i++) {
+        cout<<*userProjs[i]<<", ";
+    }
+    
+    cout<<"Please provide the projectID that you want to assign a member to an issue"<<endl;
+    cin>>givenPID;
+    
+    for(int i = 0; i < projects.size(); i++) {
+        if(givenPID == projects[i]->getProjectID()) {
+            cout<<"Please provide the issue ID you want to assign a member to."<<endl;
+            cin>>issueID;
+            cout<<"Please provide the member you want to assign the issue to."<<endl;
+            cin>>assignee;
+            for(int i = 0; i < users.size(); i++) {
+                if(assignee == users[i]->getUsername()) {
+                    assigneeMember = users[i];
+                }
+            }
+            projects[i]->assignIssue(userName, assigneeMember, issueID);
+            assigned = true;
+        }
+    }
+    if(assigned == true) {
+        cout<<"Succesfully assigned a member to this issue in this project!"<<endl;
+    }
+    else {
+        cout<<"Not successfully assigned a member to this issue in this project!"<<endl;
+    }
+}
+
+
+void Jira::updateIssueJira() {
+    bool update = false;
+    int givenPID, issueID;
+    vector<Project*> userProjs;
+    
+    for(int i = 0; i < projects.size(); i++) {
+        if(projects[i]->hasUser(this->userName)) {
+            userProjs.push_back(projects[i]);
+        }
+    }
+
+    cout<<"All of the projects you are involved: ";
+    for(int i = 0; i < userProjs.size(); i++) {
+        cout<<*userProjs[i]<<", ";
+    }
+    cout<<endl;
+    cout<<"Please provide the projectID that you want to update an issue"<<endl;
+    cin>>givenPID;
+    
+    for(int i = 0; i < projects.size(); i++) {
+        if(givenPID == projects[i]->getProjectID()) {
+            cout<<"Please provide the issue ID you want to update."<<endl;
+            cin>>issueID;
+            projects[i]->updateIssue(userName, issueID);
+            update = true;
+        }
+    }
+    if(update == true) {
+        cout<<"Succesfully updated this issue in this project!"<<endl;
+    }
+    else {
+        cout<<"Not successfully updated this issue in this project!"<<endl;
+    }
+}
+
+void Jira::deleteGivenProject() {
+    bool deleted = false;
+    int givenPID;
+    vector<Project*> userProjs;
+    
+    for(int i = 0; i < projects.size(); i++) {
+        if(projects[i]->getProjectOwner().getUsername() == this->userName) {
+            userProjs.push_back(projects[i]);
+        }
+    }
+
+    cout<<"All of the projects you are project owner: ";
+    for(int i = 0; i < userProjs.size(); i++) {
+        cout<<*userProjs[i]<<", ";
+    }
+    cout<<endl;
+    cout<<"Please provide the projectID that you want to delete"<<endl;
+    cin>>givenPID;
+    
+    for(int i = 0; i < projects.size(); i++) {
+        if(projects[i]->getProjectID() == givenPID && projects[i]->getProjectOwner().getUsername() == this->userName) {
+            projects.erase(projects.begin() + i);
+            deleted = true;
+        }
+    }
+    if(deleted == true) {
+        cout<<"Successfully deleted this project."<<endl;
+    }
+    else {
+        cout<<"Not successfully deleted this project."<<endl;
+    }
+}

@@ -145,6 +145,7 @@ string Project::getUserRole(string currentUser) {
 
 // saves current state of the project
 void Project::saveProject(){
+        string savedOutput = "";
         ofstream saved;
         cout << "Save Current State\n\n";
         saved.open("saved.txt");
@@ -160,28 +161,208 @@ void Project::saveProject(){
           }
           for (int i = 0; i < inProgress.size(); i++) {
             saved << "Sprints In Progress: " << inProgress[i]->getSprintID() << " " <<
-              inProgress[i]->getTimeFrame() << " " <<
-              inProgress[i]->getTimeWorking() << 
+              inProgress[i]->getCreatedDate() << " " <<
+              inProgress[i]->getDueDate() << 
               " ";
+
             for(int j = 0; j < inProgress[i]->getIssueSize(); j++) {
               saved << "Issues: " << inProgress[i]->getIssueWithIndex(j).getIssueID();
             }
               
           }
-          for (int i = 0; i < done.size(); i++) {
-            saved << "Issues To Do: " << done[i]->getIssueID() << " " <<
-              done[i]->getPriority() << " " <<
-              done[i]->getStatus() << " " <<
-              done[i]->getAssignedTo()->getUsername() <<endl;
+          for (int k = 0; k < done.size(); k++) {
+            saved << "Issues Done: " << done[k]->getIssueID() << " " <<
+              done[k]->getPriority() << " " <<
+              done[k]->getStatus() << " " <<
+              done[k]->getAssignedTo()->getUsername() <<endl;
           }
           saved << "Project Owner: " << projectOwner.getUsername() << endl;
+
           for (int i = 0; i < projectLeads.size(); i++) {
-            saved << "Project Leads: " << projectLeads[i]->getUsername() << endl;}
+            saved << "Project Leads: " << projectLeads[i]->getUsername() << endl;
+            
+            }
           for (int i = 0; i < teamDevelopers.size(); i++) {
-            saved << "Developers: " << teamDevelopers[i]->getUsername() << endl;}
+            saved << "Developers: " << teamDevelopers[i]->getUsername() << endl;
+            
+            }
  
      }
      saved.close();
+}
+
+// opens current state of the project based on text file
+void Project::openProject(){
+    int projectID;
+    string projectName;
+    int projectDeadline;
+    vector<Issue*> toDo;
+    int toDoIssueID;
+    string toDoPriority;
+    string toDoStatus;
+    string toDoType;
+    int toDoCreatedDate;
+    int toDoDueDate;
+    int toDoCurrentTime;
+    string toDoDescription;
+    string toDoComments;
+    string toDoUsername;
+    vector<Sprint*> inProgress;
+    int sprintID;
+    int sprintCreatedDate;
+    int sprintIssueID;
+    string sprintPriority;
+    string sprintStatus;
+    string sprintType;
+    int sprintDueDate;
+    string sprintDescription;
+    string sprintComments;
+    string sprintUsername;
+    vector<Issue*> Sprintissues;
+    vector<Issue*> done;
+    int doneIssueID;
+    string donePriority;
+    string doneStatus;
+    string doneType;
+    int doneCreatedDate;
+    int doneDueDate;
+    int doneCurrentTime;
+    string doneDescription;
+    string doneComments;
+    string doneUsername;
+    TeamMember* projectOwner;
+    string ownerName;
+    vector<TeamMember*> projectLeads;
+    string leadName;
+    vector<TeamMember*> teamDevelopers;
+    string devName;
+    ifstream project;
+    project.open("saved.txt");
+    if (!project){
+    cout << "Error in opening the file" << endl;
+}
+else if (project.is_open()) {
+    project >> projectID;
+    project >> projectName;
+    project >> projectDeadline;
+    project >> toDoIssueID;
+    project >> toDoPriority;
+    project >> toDoStatus;
+    project >> toDoType;
+    project >> toDoDueDate;
+    project >> toDoCurrentTime;
+    project >> toDoDescription;
+    project >> toDoComments;
+    project >> toDoUsername;
+    TeamMember* toDoAssign = new TeamMember(toDoUsername);
+    Issue* toDoIssue = new Issue(toDoIssueID, toDoPriority, toDoStatus, toDoType, toDoCreatedDate, toDoDueDate, toDoDescription, toDoComments, toDoAssign);
+    toDo.push_back(toDoIssue);
+    project >> sprintID;
+    project >> sprintCreatedDate;
+    project >> sprintDueDate;
+    project >> sprintIssueID;
+    project >> sprintPriority;
+    project >> sprintStatus;
+    project >> sprintType;
+    project >> sprintCreatedDate;
+    project >> sprintDueDate;
+    project >> sprintDescription;
+    project >> sprintComments;
+    project >> sprintUsername;
+    TeamMember* sprintAssign = new TeamMember(sprintUsername);
+    Issue* sprintIssue = new Issue(sprintIssueID, sprintPriority, sprintStatus, sprintType, sprintCreatedDate, sprintDueDate, sprintDescription, sprintComments, sprintAssign);
+    Sprintissues.push_back(sprintIssue);
+    Sprint* sprints = new Sprint(sprintID, sprintCreatedDate, sprintDueDate, Sprintissues);
+    inProgress.push_back(sprints);
+    project >> doneIssueID;
+    project >> donePriority;
+    project >> doneStatus;
+    project >> doneType;
+    project >> doneCreatedDate;
+    project >> doneDueDate;
+    project >> doneDescription;
+    project >> doneComments;
+    project >> doneUsername;
+    TeamMember* doneAssign = new TeamMember(doneUsername);
+    Issue* doneIssue = new Issue(doneIssueID, donePriority, doneStatus, doneType, doneCreatedDate, doneDueDate, doneDescription, doneComments, doneAssign);
+    done.push_back(doneIssue);
+    project >> ownerName;
+    TeamMember* projectOwner = new TeamMember(ownerName);
+    project >> leadName;
+    TeamMember* leads = new TeamMember(leadName);
+    projectLeads.push_back(leads);
+    project >> devName;
+    TeamMember* devs = new TeamMember(devName);
+    teamDevelopers.push_back(devs);
+
+}
+
+}
+
+// saves current state of the project to a string
+string Project::savedOutput(){
+        string savedOutput = "";
+            savedOutput += "Project ID: ";
+            savedOutput += projectID;
+            savedOutput += "; Project Name: ";
+            savedOutput += projectName;
+            savedOutput += "; Project Deadline: ";
+            savedOutput += projectDeadline;
+          for (int i = 0; i < toDo.size(); i++) {
+
+              savedOutput += "; Issues To Do: ";
+              savedOutput += toDo[i]->getIssueID();
+              savedOutput += " ";
+              savedOutput += toDo[i]->getPriority();
+              savedOutput += " ";
+              savedOutput += toDo[i]->getStatus();
+              savedOutput += " ";
+              savedOutput += toDo[i]->getAssignedTo()->getUsername();
+              savedOutput += " ";
+          }
+          for (int i = 0; i < inProgress.size(); i++) {
+              savedOutput += "; Sprints In Progress: ";
+              savedOutput += inProgress[i]->getSprintID();
+              savedOutput += " ";
+              savedOutput += inProgress[i]->getCreatedDate();
+              savedOutput += " ";
+              savedOutput += inProgress[i]->getDueDate();
+              savedOutput += " ";
+
+            for(int j = 0; j < inProgress[i]->getIssueSize(); j++) {
+
+              savedOutput += "; Issues: ";
+              savedOutput += inProgress[i]->getIssueWithIndex(j).getIssueID();
+              savedOutput += " ";
+            }
+              
+          }
+          for (int k = 0; k < done.size(); k++) {
+
+              savedOutput += "; Issues Done: ";
+              savedOutput += done[k]->getIssueID();
+              savedOutput += " ";
+              savedOutput += done[k]->getPriority();
+              savedOutput += " ";
+              savedOutput += done[k]->getStatus();
+              savedOutput += " ";
+              savedOutput += done[k]->getAssignedTo()->getUsername();
+              savedOutput += " ";
+          }
+          savedOutput += "; Project Owner: ";
+              savedOutput += projectOwner.getUsername();
+              savedOutput += " ";
+
+          for (int i = 0; i < projectLeads.size(); i++) {
+              savedOutput += projectLeads[i]->getUsername();
+              savedOutput += " ";
+            }
+          for (int i = 0; i < teamDevelopers.size(); i++) {
+              savedOutput += teamDevelopers[i]->getUsername();
+              savedOutput += " ";
+            }
+ 
+     
 }
 
 //create an issue
@@ -270,8 +451,7 @@ void Project::createIssue(string member, vector<TeamMember*> allUsers) {
         cin.ignore();
         getline(cin, comments);
 
-        Issue* issue1 = new Issue(priority, status, type, createdDate, dueDate, description, comments,
-        assignedTo);
+        Issue* issue1 = new Issue(priority, status, type, createdDate, dueDate, description, comments, assignedTo);
         
         this->toDo.push_back(issue1);
     }
@@ -435,29 +615,29 @@ void Project::updateIssue(string member, int issueID) {
     if(member == projectOwner.getUsername() || this->isMemberOfProjectLeads(member)) {
         for(int i = 0; i < toDo.size(); i++) {
             if(issueID == toDo[i]->getIssueID()) {
-                char selection = 'y';
+                string selection;
                 cout<<"Issue is in toDo list. Do you want to update this issue? (y/n)"<<endl;
                 cin>>selection;
-                if(tolower(selection) == 'y') {
-                    char decision;
+                if(selection == "y" || selection == "Y") {
+                    string decision;
                     cout<<"What do you want to update?"<<endl;
                     cout<<"Description (D), comments (C), update status (S)"<<endl;
                     cin>>decision;
-                    if(tolower(decision) == 'd') {
+                    if(decision == "d" || decision == "D") {
                       string description;
                         cout<<"Please write your new description here!"<<endl;
                         cin>>description;
                         toDo[i]->setDescription(description);
                         break;
                     }
-                    else if(tolower(decision) == 'c') {
+                    else if(decision == "c" || decision == "C") {
                       string comments;
                         cout<<"Please write your comments here!"<<endl;
                         cin>>comments;
                         toDo[i]->setComments(toDo[i]->getComments() + " " + comments);
                         break;
                     }
-                    else if(tolower(decision) == 's') {
+                    else if(decision == "S" || decision == "s") {
                         string status;
                         cout<<"Please give the status of the issue (open, in progress, done, overdue)."<<endl;
                         cin>>status;
@@ -465,63 +645,43 @@ void Project::updateIssue(string member, int issueID) {
                         break;
                     }
                 }
+                else {
+                    break;
+                }
             }
         }
         for(int j = 0; j < inProgress.size(); j++) {
-            for(int z = 0; z < inProgress[j]->getIssueSize(); z++) {
-                if(issueID == inProgress[j]->getIssueWithIndex(z).getIssueID()) {
-                    char selection = 'y';
-                    cout<<"Issue is in InProgress list: Sprint ID: " <<inProgress[j]->getSprintID()<<" .Do you want to update this issue? (y/n)"<<endl;
-                    cin>>selection;
-                    if(tolower(selection) == 'y') {
-                      char decision;
-                        cout<<"What do you want to update?"<<endl;
-                        cout<<"Description (D), comments (C), update status(S)."<<endl;
-                        cin>>decision;
-                        if(tolower(decision) == 'd') {
-                          string description;
-                            cout<<"Please write your new description here!"<<endl;
-                            cin>>description;
-                            inProgress[j]->getIssueWithIndex(z).setDescription(description);
-                            break;
-                        }
-                        else if(tolower(decision) == 'c') {
-                          string comments;
-                            cout<<"Please write your comments here!"<<endl;
-                            cin>>comments;
-                            inProgress[j]->getIssueWithIndex(z).setComments(inProgress[j]->getIssueWithIndex(z).getComments() + " " + comments);
-                            break;
-                        }
-                        else if(tolower(decision) == 's') {
-                          
-                            string status;
-                            cout<<"Please give the status of the issue (open, in progress, done, overdue)."<<endl;
-                            cin>>status;
-                            inProgress[j]->getIssueWithIndex(z).setStatus(status);
-                            break;
-                        }
-                    }
+            if(inProgress[j]->findIssue(issueID)) {
+                string selection;
+                cout<<"Issue is in InProgress list. Sprint ID: " <<inProgress[j]->getSprintID()<<" .Do you want to update this issue? (y/n)"<<endl;
+                cin>>selection;
+                if(selection == "y" || selection == "Y") {
+                    inProgress[j]->updateIssueSprint(issueID, "projectLead/Owner");
+                    break;
+                }
+                else {
+                    break;
                 }
             }
         }
       for(int k = 0; k < done.size(); k++) {
         if(issueID == done[k]->getIssueID()) {
-            char selection = 'y';
+            string selection;
             cout<<"Issue is in Done list. Do you want to update this issue? (y/n)"<<endl;
             cin>>selection;
-            if(tolower(selection) == 'y') {
-              char decision;
+            if(selection == "y" || selection == "Y") {
+                string decision;
                 cout<<"What do you want to update?"<<endl;
                 cout<<"Description (D), comments (C)."<<endl;
                 cin>>decision;
-                if(tolower(decision) == 'd') {
+                if(decision == "d" || decision == "D") {
                   string description;
                     cout<<"Please write your new description here!"<<endl;
                     cin>>description;
                     done[k]->setDescription(description);
                     break;
                 }
-                else if(tolower(decision) == 'c') {
+                else if(decision == "C" || decision == "c") {
                   string comments;
                     cout<<"Please write your comments here!"<<endl;
                     cin>>comments;
@@ -529,64 +689,51 @@ void Project::updateIssue(string member, int issueID) {
                     break;
                 }
             }
-        }        
+            else {
+                break;
+            }
+        }
     }
       }
     //if member is the developers
     else if(this->isMemberOfDevelopers(member)) {
+        cout<<"You are a developer. You can only comment on the issue."<<endl;
         for(int i = 0; i < toDo.size(); i++) {
             if(toDo[i]->getIssueID() == issueID && toDo[i]->getAssignedTo()->getUsername() == member) {
-                char selection = 'y';
+                string selection;
                 cout<<"Issue is in toDo list. Do you want to update this issue? (y/n)"<<endl;
                 cin>>selection;
-                if(tolower(selection) == 'y') {
-                  char decision;
-                    cout<<"What do you want to update?"<<endl;
-                    cout<<"Comments (C), update status (S)."<<endl;
+                if(selection == "y" || selection == "Y") {
+                    string decision;
+                    cout<<"Do you want to comment on this issue?"<<endl;
                     cin>>decision;
-                    if(tolower(decision) == 's') {
-                        string status;
-                        cout<<"Please give the status of the issue (open, in progress, done, overdue)."<<endl;
-                        cin>>status;
-                        toDo[i]->setStatus(status);
-                        break;
-                    }
-                    else if(tolower(decision) == 'c') {
+                    if(decision == "c" || decision == "C") {
                       string comments;
                         cout<<"Please write your comments here!"<<endl;
                         cin>>comments;
                         toDo[i]->setComments(toDo[i]->getComments() + " " + comments);
                         break;
                     }
+                    else {
+                        break;
+                    }
+                }
+                else {
+                    break;
                 }
             }
         }
         for(int j = 0; j < inProgress.size(); j++) {
-            for(int z = 0; z < inProgress[j]->getIssueSize(); z++) {
-                if(issueID == inProgress[j]->getIssueWithIndex(z).getIssueID() && member == inProgress[j]->getIssueWithIndex(z).getAssignedTo()->getUsername()) {
-                    char selection = 'y';
-                    cout<<"Issue is in InProgress list: Sprint ID: " <<inProgress[j]->getSprintID()<<" .Do you want to update this issue? (y/n)"<<endl;
-                    cin>>selection;
-                    if(tolower(selection) == 'y') {
-                      char decision;
-                        cout<<"What do you want to update?"<<endl;
-                        cout<<"Comments (C), update status(S)"<<endl;
-                        cin>>decision;
-                        if(tolower(decision) == 'c') {
-                          string comments;
-                            cout<<"Please write your comments here!"<<endl;
-                            cin>>comments;
-                            inProgress[j]->getIssueWithIndex(z).setComments(inProgress[j]->getIssueWithIndex(z).getComments() + " " + comments);
-                            break;
-                        }
-                        else if(tolower(decision) == 's') {
-                            string status;
-                            cout<<"Please give the status of the issue (open, in progress, done, overdue)."<<endl;
-                            cin>>status;
-                            inProgress[j]->getIssueWithIndex(z).setStatus(status);
-                            break;
-                        }
-                    }
+            if(inProgress[j]->findIssue(issueID)) {
+                string selection;
+                cout<<"Issue is in InProgress list. Sprint ID: " <<inProgress[j]->getSprintID()<<" .Do you want to comment on this issue? (y/n)"<<endl;
+                cin>>selection;
+                if(selection == "y" || selection == "Y") {
+                    inProgress[j]->updateIssueSprint(issueID, "developer");
+                    break;
+                }
+                else {
+                    break;
                 }
             }
         }
@@ -682,5 +829,61 @@ void Project::moveIssue(string member, int issueID) {
     }
     else {
         cout<<"You are not in this project!"<<endl;
+    }
+}
+
+// void Project::moveIssue(int issueID, string section) {
+//     for (int i = 0; i < toDo.size() < i++) {
+//         if (toDo.at(i)->getIssueID() == issueID) {
+//             Issue* coppiedIssue = toDo[i];
+//             if (section == "toDo") {
+//                 toDo.push_back(toDo.at(i));
+//                 toDo.erase(toDo.begin() + i);
+//             }
+//             if (section == "inProgress") {
+//                 inProgress.push_back(toDo.at(i));
+//                 toDo.erase(toDo.begin() + i);
+//             }
+//             if (section == "done") {
+//                 done.push_back(toDo.at(i));
+//                 toDo.erase(toDo.begin() + i);
+//             }
+//         }
+//     }
+
+//     for (int i = 0; i < inProgress.size() < i++) {
+//         if (inProgress.at(i)->getIssueID() == issueID) {
+//             Issue* coppiedIssue = inProgress[i];
+//             if (section == "inProgress") {
+//                 inProgress.push_back(inProgress.at(i));
+//                 inProgress.erase(inProgress.begin() + i);
+
+//             }
+//         }
+//     }
+
+//     for (int i = 0; i < done.size() < i++) {
+//         if (done.at(i)->getIssueID() == issueID) {
+//             Issue* coppiedIssue = done[i];
+//             if (section == "done") {
+//                 done.push_back(done.at(i));
+//                 done.erase(done.begin() + i);
+//             }
+//         }
+//     }
+// }  
+
+void Project::dumpSprint(int sprintID) {
+    for (int i = 0; i < inProgress.size(); i++) {
+        if (inProgress.at(i)->getSprintID() == sprintID) {
+            for (int j = 0; j < inProgress.at(i)->getIssues().size(); j++) {
+                // Move to todo
+                Issue* coppiedIssue = inProgress.at(i)->getIssues().at(j);
+                coppiedIssue->setStatus("open");
+                toDo.push_back(coppiedIssue);
+                // Don't need to delete because we will delete the whole sprint, which is the only place this lives
+            }
+            inProgress.erase(inProgress.begin() + i);
+        }
     }
 }

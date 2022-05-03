@@ -17,7 +17,7 @@ class Issue {
         string type;
         int createdDate;
         int dueDate;
-        int completionPercent;
+        int currentTime;
         string description;
         string comments;
         TeamMember* assignedTo;
@@ -26,6 +26,8 @@ class Issue {
     Issue();
         Issue(TeamMember* assignedToMember);
         Issue(string given_pr, string given_status, string given_type,
+int given_created, int given_due, string given_description, string given_comments, TeamMember* given_member);
+    Issue(int issueID, string given_pr, string given_status, string given_type,
 int given_created, int given_due, string given_description, string given_comments, TeamMember* given_member);
     int getIssueID() {return issueID;}
     void setIssueID(int given_issueID) {issueID = given_issueID;}
@@ -41,14 +43,12 @@ int given_created, int given_due, string given_description, string given_comment
     void setCreatedDate(int given_created) {createdDate = given_created;}
     int getDueDate() {return dueDate;}
     void setDueDate(int given_due) {dueDate = given_due;}
-    int getCompletionPercent() {return (dueDate-createdDate)/createdDate;}
-    void setCompletionPercent(int given_due, int given_created)
-    {completionPercent = (given_due-given_created)/given_created;}
+    int getCurrentTime() {return currentTime;}
+    void setCurrentTime(int t) {currentTime = t;}
      string getDescription() {return description;}
     void setDescription(string given_description) {description = given_description;}
      string getComments() {return comments;}
     void setComments(string given_comments) {comments = given_comments;}
-    
     Issue& operator=(const Issue& given_issue);
     friend ostream& operator<<(ostream& out, const Issue& issue);
 };

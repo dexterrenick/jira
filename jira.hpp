@@ -37,21 +37,21 @@ public:
     // Copy constructor
     Jira(const Jira &j);
     // Allows project owner to make new prjoect
-    void createProject(vector<Project*> &allProjects);
+    void createProject();
     // Allows user to create an account if they do not yet have one
-    void createAccount(vector<TeamMember*> &allUsers, vector<Project*> &allProjects);
+    void createAccount();
     // Allows user to sign in if they already have an account
-    void signIn(vector<TeamMember*> &allUsers, vector<Project*> &allProjects);
+    void signIn();
     // Saves user out to users.txt when program closes
     void saveUsers();
     // Increment's the time by one
-    void incrementTime();
+    void incrementTime(){this->time++;};
     // Homepage for jira to access various parts of the project
-    void displayJiraHome(vector<TeamMember*> &allUsers, vector<Project*> &allProjects);
+    void displayJiraHome();
     //check if the given username is available or not
     bool isUserUsed(string givenUsername);
     // Allows user option to sign in or up for jira account
-    void displaySignInUp(vector<TeamMember*> &allUsers, vector<Project*> &allProjects);
+    void displaySignInUp();
     // Timer to run asynchronously to control project time
     static void runTimer();
     
@@ -62,9 +62,11 @@ public:
     void displayUserGivenPj();
     
     //to log out and restart the sign in/sign up
-    void logOut(vector<TeamMember*> &allUsers, vector<Project*> &allProjects);
+    void logOut();
     
-    void createIssueJira(vector<TeamMember*> allUsers, vector<Project*> allProjects);
+    void createIssueJira();
+
+    void openJira();
 
     // Get time
     int getTime() const {return this->time;}
@@ -79,11 +81,21 @@ public:
     vector<TeamMember*> getUsers() const {return this->users;}
     void setUsers(vector<TeamMember*> givenUsers) {this->users = givenUsers;}
 
-    void deleteGivenIssue(vector<Project*> allProjects);
-    void moveGivenIssue(vector<Project*> allProjects);
+    void deleteGivenIssue();
+    void deleteGivenProject();
+    void moveGivenIssue();
+
+    void assignIssueJira();
+
+    void updateIssueJira();
 
     void saveJira();
 
+    // Simulates working on working on a sprint
+    void sprintSimulation();
+
+    // Delets sprints at deadlines, moves completed items to todo, sets issue status if complete, sets issues current time
+    void updateAllStatus();
 };
 
 #endif

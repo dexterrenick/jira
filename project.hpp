@@ -85,7 +85,6 @@ public:
 
     void createIssue(string member, vector<TeamMember*> allUsers);
 
-    void deleteIssue(TeamMember owner, int issueID);
 
     void deleteIssue(string member, int issueID);
 
@@ -102,7 +101,16 @@ public:
     //Move issue from one place to another
     void moveIssue(string member, int issueID);
 
+    // Moves all items from sprint to todo and deletes sprint
+    void dumpSprint(int sprintID);
+
+
     void updateIssue(string member, int issueID);
+
+    string savedOutput();
+
+    // opens text file and updates project based on given textfile
+    void openProject();
 
 private:
     inline static int currentProject = 0;

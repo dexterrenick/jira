@@ -72,9 +72,9 @@ int main() {
     vector<Project*> allProjects;
     allProjects.push_back(p1);
     
-    Jira* j = new Jira(100, "", allProjects, allUsers);
+    Jira* j = new Jira(0, "", allProjects, allUsers);
     
-    j->displaySignInUp(allUsers, allProjects);
+    j->displaySignInUp();
     //j->createAccount(allUsers, allProjects);
     
     for(int i = 0; i < allUsers.size(); i++) {
